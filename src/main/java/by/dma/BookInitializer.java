@@ -30,6 +30,8 @@ public class BookInitializer implements CommandLineRunner {
       book.setTitle(faker.book().title());
       book.setAuthor(faker.book().author());
       book.setIsbn(UUID.randomUUID().toString());
+      book.setPublishYear(faker.number().numberBetween(1900, 2020));
+      book.setPrice(faker.number().randomDouble(2, 1, 100));
 
       bookRepository.save(book);
     }
