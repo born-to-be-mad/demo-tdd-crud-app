@@ -102,7 +102,7 @@ public class BookControllerTest {
         mockMvc
                 .perform(get("/api/books"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].title", is("Jedi way to Java 17")))
                 .andExpect(jsonPath("$[0].author", is("James Bond")))
@@ -124,7 +124,7 @@ public class BookControllerTest {
         mockMvc
                 .perform(get("/api/books/1"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.title", is("Jedi way to Java 17")))
                 .andExpect(jsonPath("$.author", is("James Bond")))
                 .andExpect(jsonPath("$.isbn", is("123456")))
@@ -172,7 +172,7 @@ public class BookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(bookRequest)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.publishYear", is(publishYear)))
                 .andExpect(jsonPath("$.price", is(price)))
                 .andExpect(jsonPath("$.title", is(title)))

@@ -19,6 +19,8 @@ import static org.hamcrest.Matchers.is;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BookControllerIT {
 
+  private static final String API_PATH = "/api/books/";
+
   @LocalServerPort
   int randomServerPort;
 
@@ -26,7 +28,7 @@ public class BookControllerIT {
 
   @BeforeEach
   public void setUp() {
-    this.testRestTemplate = new TestRestTemplate();
+    testRestTemplate = new TestRestTemplate();
   }
 
   @Test
@@ -34,16 +36,14 @@ public class BookControllerIT {
     long bookId = 1;
     String baseUrl = "http://localhost:" + randomServerPort;
 
-    ResponseEntity<JsonNode> firstResult = this.testRestTemplate
-      .getForEntity(baseUrl + "/api/books/" + bookId, JsonNode.class);
-
+    ResponseEntity<JsonNode> firstResult =
+            testRestTemplate.getForEntity(baseUrl + API_PATH + bookId, JsonNode.class);
     assertThat(firstResult.getStatusCode(), is(HttpStatus.OK));
 
-    this.testRestTemplate.delete(baseUrl + "/api/books/" + bookId);
+    testRestTemplate.delete(baseUrl + API_PATH + bookId);
 
-    ResponseEntity<JsonNode> secondResult = this.testRestTemplate
-      .getForEntity(baseUrl + "/api/books/" + bookId, JsonNode.class);
-
+    ResponseEntity<JsonNode> secondResult =
+            testRestTemplate.getForEntity(baseUrl + API_PATH + bookId, JsonNode.class);
     assertThat(secondResult.getStatusCode(), is(HttpStatus.NOT_FOUND));
   }
 }
