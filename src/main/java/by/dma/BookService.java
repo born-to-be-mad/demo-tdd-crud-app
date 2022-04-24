@@ -1,23 +1,26 @@
 package by.dma;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.AllArgsConstructor;
+
 @Service
+@AllArgsConstructor
 public class BookService {
 
-  @Autowired
-  private BookRepository bookRepository;
+  private final BookRepository bookRepository;
 
   public Long createNewBook(BookRequest bookRequest) {
     Book book = new Book();
     book.setIsbn(bookRequest.getIsbn());
     book.setAuthor(bookRequest.getAuthor());
     book.setTitle(bookRequest.getTitle());
+    book.setPublishYear(bookRequest.getPublishYear());
+    book.setPrice(bookRequest.getPrice());
 
     book = bookRepository.save(book);
 
@@ -32,7 +35,7 @@ public class BookService {
     Optional<Book> requestedBook = bookRepository.findById(id);
 
     if (requestedBook.isEmpty()) {
-      throw new BookNotFoundException(String.format("Book with id: '%s' not found", id));
+      throw BookNotFoundException.fromId(id);
     }
 
     return requestedBook.get();
@@ -40,18 +43,18 @@ public class BookService {
 
   @Transactional
   public Book updateBook(Long id, BookRequest bookToUpdateRequest) {
-
     Optional<Book> bookFromDatabase = bookRepository.findById(id);
 
     if (bookFromDatabase.isEmpty()) {
-      throw new BookNotFoundException(String.format("Book with id: '%s' not found", id));
+      throw BookNotFoundException.fromId(id);
     }
 
     Book bookToUpdate = bookFromDatabase.get();
-
     bookToUpdate.setAuthor(bookToUpdateRequest.getAuthor());
     bookToUpdate.setIsbn(bookToUpdateRequest.getIsbn());
     bookToUpdate.setTitle(bookToUpdateRequest.getTitle());
+    bookToUpdate.setIsbn(bookToUpdateRequest.getIsbn());
+    bookToUpdate.setPublishYear(bookToUpdateRequest.getPublishYear());
 
     return bookToUpdate;
   }

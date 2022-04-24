@@ -3,7 +3,6 @@ package by.dma;
 import javax.validation.Valid;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/api/books")
+@AllArgsConstructor
 public class BookController {
 
-  @Autowired
-  private BookService bookService;
+  private final BookService bookService;
 
   @PostMapping
   public ResponseEntity<Void> createNewBook(@Valid @RequestBody BookRequest bookRequest, UriComponentsBuilder uriComponentsBuilder) {

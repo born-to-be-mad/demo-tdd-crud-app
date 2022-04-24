@@ -86,10 +86,17 @@ public class BookControllerTest {
     public void allBooksEndpointShouldReturnTwoBooks() throws Exception {
 
         when(bookservice.getAllBooks())
-                .thenReturn(
-                        List.of(
-                                createBook(1L, "Jedi way to Java 17", "James Bond", "123456"),
-                                createBook(2L, "Java EE 8", "James Bond", "1338"))
+                .thenReturn(List.of(
+                        new Book()
+                                .setAuthor("James Bond")
+                                .setIsbn("123456")
+                                .setTitle("Jedi way to Java 17")
+                                .setId(1L),
+                        new Book()
+                                .setAuthor("John Snow")
+                                .setIsbn("234567")
+                                .setTitle("Java EE 8")
+                                .setId(2L))
                 );
 
         mockMvc
@@ -108,7 +115,11 @@ public class BookControllerTest {
     public void getBookWithIdOneShouldReturnABook() throws Exception {
 
         when(bookservice.getBookById(1L))
-                .thenReturn(createBook(1L, "Jedi way to Java 17", "James Bond", "123456"));
+                .thenReturn(new Book()
+                        .setAuthor("James Bond")
+                        .setIsbn("123456")
+                        .setTitle("Jedi way to Java 17")
+                        .setId(1L));
 
         mockMvc
                 .perform(get("/api/books/1"))
@@ -123,7 +134,6 @@ public class BookControllerTest {
 
     @Test
     public void getBookWithUnknownIdShouldReturn404() throws Exception {
-
         when(bookservice.getBookById(1L))
                 .thenThrow(new BookNotFoundException("Book with id '1' not found"));
 
@@ -135,15 +145,27 @@ public class BookControllerTest {
 
     @Test
     public void updateBookWithKnownIdShouldUpdateTheBook() throws Exception {
-
+        var author = "James Bond";
+        var isbn = "123456";
+        var title = "Java 17";
+        var price = 29.99;
+        var publishYear = 2022;
         BookRequest bookRequest = BookRequest.builder()
-                .author("James Bond")
-                .isbn("123456")
-                .title("Java 17")
+                .author(author)
+                .isbn(isbn)
+                .title(title)
+                .price(price)
+                .publishYear(publishYear)
                 .build();
 
         when(bookservice.updateBook(eq(1L), requestArgumentCaptor.capture()))
-                .thenReturn(createBook(1L, "Java 17", "James Bond", "123456"));
+                .thenReturn(new Book()
+                        .setPublishYear(publishYear)
+                        .setPrice(price)
+                        .setAuthor(author)
+                        .setIsbn(isbn)
+                        .setTitle(title)
+                        .setId(1L));
 
         mockMvc
                 .perform(put("/api/books/1")
@@ -151,25 +173,31 @@ public class BookControllerTest {
                         .content(objectMapper.writeValueAsString(bookRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.title", is("Java 17")))
-                .andExpect(jsonPath("$.author", is("James Bond")))
-                .andExpect(jsonPath("$.isbn", is("123456")))
+                .andExpect(jsonPath("$.publishYear", is(publishYear)))
+                .andExpect(jsonPath("$.price", is(price)))
+                .andExpect(jsonPath("$.title", is(title)))
+                .andExpect(jsonPath("$.author", is(author)))
+                .andExpect(jsonPath("$.isbn", is(isbn)))
                 .andExpect(jsonPath("$.id", is(1)));
 
-        assertThat(requestArgumentCaptor.getValue().getAuthor(), is("James Bond"));
-        assertThat(requestArgumentCaptor.getValue().getIsbn(), is("123456"));
-        assertThat(requestArgumentCaptor.getValue().getTitle(), is("Java 17"));
+        var requestArgumentCaptorValue = requestArgumentCaptor.getValue();
+        assertThat(requestArgumentCaptorValue.getPublishYear(), is(publishYear));
+        assertThat(requestArgumentCaptorValue.getPrice(), is(price));
+        assertThat(requestArgumentCaptorValue.getAuthor(), is(author));
+        assertThat(requestArgumentCaptorValue.getIsbn(), is(isbn));
+        assertThat(requestArgumentCaptorValue.getTitle(), is(title));
 
     }
 
     @Test
     public void updateBookWithUnknownIdShouldReturn404() throws Exception {
-
-      BookRequest bookRequest = BookRequest.builder()
-              .author("James Bond")
-              .isbn("123456")
-              .title("Java 17")
-              .build();
+        BookRequest bookRequest = BookRequest.builder()
+                .author("James Bond")
+                .isbn("123456")
+                .title("Java 17")
+                .price(29.99)
+                .publishYear(2022)
+                .build();
 
         when(bookservice.updateBook(eq(42L), requestArgumentCaptor.capture()))
                 .thenThrow(new BookNotFoundException("The book with id '42' was not found"));
@@ -180,15 +208,6 @@ public class BookControllerTest {
                         .content(objectMapper.writeValueAsString(bookRequest)))
                 .andExpect(status().isNotFound());
 
-    }
-
-    private Book createBook(Long id, String title, String author, String isbn) {
-        Book book = new Book();
-        book.setAuthor(author);
-        book.setIsbn(isbn);
-        book.setTitle(title);
-        book.setId(id);
-        return book;
     }
 
 }
